@@ -18,7 +18,7 @@
 			</div>
 
 			<div class="box">
-				{visibleAnswer}
+				{@html visibleAnswer}
 
 				<span
 					data-hidden={visibleWords === 0 || !wordsAreLeftToDisplay}
@@ -26,7 +26,7 @@
 				>…</span>
 
 				<span style="visibility: hidden">
-					{hiddenAnswer}
+					{@html hiddenAnswer}
 				</span>
 			</div>
 		{/if}
@@ -141,7 +141,7 @@ footer * {
 import isTouchscreen from 'lib/is-touchscreen.js'
 import chunkPhrase from 'lib/phrase-chunker.js'
 
-const CHUNK_BARRIERS = new Set([ `,`, `.`, `;`, `:`, `"`, `'`, `’`, `”`, '?' ])
+const CHUNK_BARRIERS = new Set([ `,`, `.`, `;`, `:`, `"`, `'`, `’`, `”`, '?', `<br>` ])
 
 export default {
 	data() {
@@ -156,7 +156,9 @@ export default {
 	},
 	computed: {
 		currentCard: ({ currentQuestionPosition, sheet }) => {
-			const row = sheet.rows[currentQuestionPosition]
+			var row = sheet.rows[currentQuestionPosition]
+			row[1] = row[1].replace(/\n/g, "<br> ")
+			row[1] = row[1].replace(/  /g, "&nbsp;&nbsp;")
 
 			return row
 				? {
@@ -169,7 +171,7 @@ export default {
 		displayHeader: ({ sheet, workbook }) => sheet.name === `Sheet1`
 			? workbook.name
 			: `${ workbook.name } · ${ sheet.name }`,
-		answerWords: ({ currentCard }) => currentCard.answer.split(/\s+/g),
+		answerWords: ({ currentCard }) => currentCard.answer.split(/ /g),
 		chunkable: ({ answerWords }) => answerWords.length >= 20,
 		phraseChunks: ({ chunkable, answerWords }) => chunkable
 			? chunkPhrase({
